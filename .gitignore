@@ -1,0 +1,14 @@
+# Backup files
+*.bak
+
+# List files
+*.lst
+
+# Object files
+*.obj
+
+# html files
+*.htm
+
+/python/__pycache__
+
