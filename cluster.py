@@ -66,17 +66,27 @@ def makeBclFromBpl( bpl ):
 
     currCombineIdx = 0
     while currCombineIdx < len( clustersToCombineNoDups ):
-        print( 'combining clusters', clustersToCombineNoDups[ currCombineIdx ] )
+
+        print( 'combining/copying cluster  {} '.format( clustersToCombineNoDups[currCombineIdx] ) )
+
+        set1 = set( bcl[ clustersToCombineNoDups[ currCombineIdx ][0] ] )
+        set2 = set( bcl[ clustersToCombineNoDups[ currCombineIdx ][1] ] )
+        set3 = set1.union( set2 )
+        lst  = list( set3 )
+
         clustersHandled.extend( clustersToCombineNoDups[ currCombineIdx ] )
+        collapsedBcl.append( lst )
         currCombineIdx += 1
 
     currBclIdx = 0
     while currBclIdx < len( bcl ):
         if currBclIdx not in clustersHandled:
             print( 'copying cluster  {} '.format( currBclIdx ) )
+            collapsedBcl.append( bcl[currBclIdx]  )
             clustersHandled.append( currBclIdx )
         currBclIdx += 1
 
+    print( 'clusters handled' )
     pprint.pprint( clustersHandled.sort() )
 
     ca = [ (1,1),(2,2),(3,3),(4,4),(5,5),(6,6)  ]
@@ -88,15 +98,15 @@ def makeBclFromBpl( bpl ):
     ccs = cas.union(cbs)
     ccl = list(ccs)
 
-    print(ca)
-    print(cb)
-    print()
-    print(cas)
-    print(cbs)
-    print()
-    print(ccs)
-    print()
-    print(ccl)
+    #print(ca)
+    #print(cb)
+    #print()
+    #print(cas)
+    #print(cbs)
+    #print()
+    #print(ccs)
+    #print()
+    #print(ccl)
 
     #return collapsedBcl
     return bcl
