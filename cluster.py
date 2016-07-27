@@ -43,10 +43,10 @@ def makeBclFromBpl( bpl ):
     # { (1,2): [9,10]) } means pixel 1,2 is a member of clusters 9 and 10.
     pixelClustDict = {}
     for currBp in bpl:
-        pixelClustDict[currBp] = []
-        for ii in range(len(bcl)):
-            if currBp in bcl[ii]:
-                pixelClustDict[currBp].append(ii)
+        pixelClustDict[ currBp ] = []
+        for ii in range( len( bcl ) ):
+            if currBp in bcl[ ii ]:
+                pixelClustDict[ currBp ].append( ii )
 
     # Build a list of clusters that need to be combined.
     clustersToCombine = [ pixelClustDict[myKey] for myKey in pixelClustDict if len(pixelClustDict[myKey]) > 1 ]
@@ -56,34 +56,47 @@ def makeBclFromBpl( bpl ):
     # { (2,3): [9,10]) } means pixel 2,3 is a member of clusters 9 and 10.
     # Don't want to combine clusters 9 and 10 twice.
     clustersToCombineNoDups = []
-    for i in clustersToCombine:
-       if i not in clustersToCombineNoDups:
-          clustersToCombineNoDups.append(i)
-
-    # Sort (will make collapsing, below, easier).
-    clustersToCombineNoDupsSorted = sorted(clustersToCombineNoDups, key=lambda x: x[0])
-    pprint.pprint( clustersToCombineNoDupsSorted )
+    for ii in clustersToCombine:
+       if ii not in clustersToCombineNoDups:
+          clustersToCombineNoDups.append( ii )
 
     # Collapse Bcl.
-    c2cnds = clustersToCombineNoDupsSorted
-    collapsedBcl   = []
+    collapsedBcl    = []
+    clustersHandled = []
 
-    combineMaxIdx  = len( c2cnds ) - 1
     currCombineIdx = 0
+    while currCombineIdx < len( clustersToCombineNoDups ):
+        print( 'combining clusters', clustersToCombineNoDups[ currCombineIdx ] )
+        clustersHandled.extend( clustersToCombineNoDups[ currCombineIdx ] )
+        currCombineIdx += 1
 
-    bclMaxIdx      = len( bcl ) - 1
-    currBclIdx     = 0
+    currBclIdx = 0
+    while currBclIdx < len( bcl ):
+        if currBclIdx not in clustersHandled:
+            print( 'copying cluster  {} '.format( currBclIdx ) )
+            clustersHandled.append( currBclIdx )
+        currBclIdx += 1
 
-    while currBclIdx < bclMaxIdx:
-        if currBclIdx == c2cnds[currCombineIdx][0]:
-            print('combining clusters', c2cnds[currCombineIdx] )
-            currCombineIdx += 1 
-            currBclIdx     += 2
-        else:
-            print('copying clusters {} '.format(currBclIdx))
-            currBclIdx += 1
+    pprint.pprint( clustersHandled.sort() )
 
+    ca = [ (1,1),(2,2),(3,3),(4,4),(5,5),(6,6)  ]
+    cb = [ (1,1),(2,2),(3,3),(9,9),(5,5),(6,6)  ]
 
+    cas = set(ca)
+    cbs = set(cb)
+
+    ccs = cas.union(cbs)
+    ccl = list(ccs)
+
+    print(ca)
+    print(cb)
+    print()
+    print(cas)
+    print(cbs)
+    print()
+    print(ccs)
+    print()
+    print(ccl)
 
     #return collapsedBcl
     return bcl
@@ -129,16 +142,18 @@ if __name__ == '__main__':
     #       [ [ (1, 3), (1, 4), (2, 3), (2, 4) ], 
     #         [ (5, 5), (5, 6), (6, 5), (6, 6)] ]
 
-    for currGbpm in gBpm:
+    for currGbpm in gBpm[0:4]:
 
         mBpl = makeBplFromBpm( currGbpm )
         mBcl = makeBclFromBpl( mBpl )
     
         numClustersLenEq1 = sum(1 for c in mBcl if len(c) == 1)
         numClustersLenGt1 = sum(1 for c in mBcl if len(c)  > 1)
-        maxClusterSize = 0
+
         if len(mBcl):  # Cover case where there are no bad pixels.
-            maxClusterSize    = max(len(c) for c in mBcl)
+            maxClusterSize = max(len(c) for c in mBcl)
+        else:
+            maxClusterSize = 0
     
         hist = [0]*(maxClusterSize+1)
         for c in mBcl:
@@ -162,7 +177,7 @@ if __name__ == '__main__':
             if hist[ii] > 0:
                 print( ' * {:4d} Clusters contain {:4d} Pixels. *'.format( hist[ii], ii ))
     
-        print( ' ******************************************************************')
+        print( ' \n******************************************************************\n')
     
         singletonCnt = 0
         for ii in range(len(mBcl)):
