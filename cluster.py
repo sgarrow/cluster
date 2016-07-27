@@ -87,42 +87,22 @@ def makeBclFromBpl( bpl ):
         currBclIdx += 1
 
     print( 'clusters handled' )
-    pprint.pprint( clustersHandled.sort() )
+    pprint.pprint( clustersHandled )
 
-    ca = [ (1,1),(2,2),(3,3),(4,4),(5,5),(6,6)  ]
-    cb = [ (1,1),(2,2),(3,3),(9,9),(5,5),(6,6)  ]
+    return collapsedBcl
 
-    cas = set(ca)
-    cbs = set(cb)
-
-    ccs = cas.union(cbs)
-    ccl = list(ccs)
-
-    #print(ca)
-    #print(cb)
-    #print()
-    #print(cas)
-    #print(cbs)
-    #print()
-    #print(ccs)
-    #print()
-    #print(ccl)
-
-    #return collapsedBcl
-    return bcl
-
-# [[4, 5],
-# [9, 10],
-# [41, 42],
-# [52, 56],
-# [53, 57],
-# [54, 56],
-# [61, 62],
-# [69, 70],
-# [91, 92],
-# [121, 123],
-# [125, 126],
-# [144, 146]]
+ # [[4, 5],
+ # [9, 10],
+ # [41, 42],
+ # [52, 56],
+ # [53, 57],
+ # [54, 56],
+ # [61, 62],
+ # [69, 70],
+ # [91, 92],
+ # [121, 123],
+ # [125, 126],
+ # [144, 146]]
 #############################################
 
 if __name__ == '__main__':
@@ -194,3 +174,28 @@ if __name__ == '__main__':
             if len(mBcl[ii])>0:
                 pass
 #                print( '   Cluster {:3} has {:3} pixels: {}'.format( ii, len(mBcl[ii]), mBcl[ii]) )
+
+#*  102 Clusters contain    1 Pixels. * 102 Clusters contain    1 Pixels. * 
+#*   10 Clusters contain    2 Pixels. *  10 Clusters contain    2 Pixels. * 
+#*    9 Clusters contain    3 Pixels. *   9 Clusters contain    3 Pixels. * 
+#*    7 Clusters contain    4 Pixels. *   7 Clusters contain    4 Pixels. * 
+#*    4 Clusters contain    5 Pixels. *   4 Clusters contain    5 Pixels. * 
+#*    1 Clusters contain    6 Pixels. *   1 Clusters contain    6 Pixels. * 
+#*    2 Clusters contain   10 Pixels. *   3 Clusters contain   10 Pixels. * 
+#*    1 Clusters contain   13 Pixels. *   1 Clusters contain   13 Pixels. * 
+#*    1 Clusters contain   15 Pixels. *   1 Clusters contain   15 Pixels. * 
+#*    1 Clusters contain   17 Pixels. *   2 Clusters contain   17 Pixels. * 
+#*    1 Clusters contain   23 Pixels. *   
+#*    1 Clusters contain   25 Pixels. *   1 Clusters contain   25 Pixels. *  
+
+
+
+
+
+
+
+
+
+
+
+
