@@ -26,83 +26,59 @@ def iBelong( currBp, currCL ):
 # Make a Bad-Cluster-List from a Bad-Pixel-List.
 def makeBclFromBpl( bpl ):
 
-    # Insert this bad pix into all clusters to which he belongs,
     bcl = []
+
     for currBp in bpl:
-        pixelHandled = 0
-        for currCluster in bcl:
-            if( iBelong(currBp, currCluster)):
-                currCluster.append( currBp )   # Add this BP into this Cluster. 
-                pixelHandled += 1
-                if pixelHandled == 2:          # Will never be part of more than 2 clusters.
+
+        pixBelongs2Clstrs = []
+
+        # Find the clusters to which he belongs, max 2.
+        for ii in range ( len( bcl ) ):
+            if( iBelong( currBp, bcl[ ii ]  ) ):
+                pixBelongs2Clstrs.append( ii )
+                if len( pixBelongs2Clstrs ) == 2:
                     break
-        if not pixelHandled:
-            bcl.append( [ currBp ] )           # Insert this BP into a NEW Cluster.
+        #print( pixBelongs2Clstrs )
 
-    # Build Cluster Dictionary.
-    # { (1,2): [9,10]) } means pixel 1,2 is a member of clusters 9 and 10.
-    pixelClustDict = {}
-    for currBp in bpl:
-        pixelClustDict[ currBp ] = []
-        for ii in range( len( bcl ) ):
-            if currBp in bcl[ ii ]:
-                pixelClustDict[ currBp ].append( ii )
+        # Insert this BP into a new Cluster.  
+        if len( pixBelongs2Clstrs ) == 0:
+            bcl.append( [ currBp ] )
+            myStr = 'pixel {} creates   new cluster {}: {}\n'
+            print(myStr.format( currBp, len(bcl)-1, bcl[-1] ))
 
-    # Build a list of clusters that need to be combined.
-    clustersToCombine = [ pixelClustDict[myKey] for myKey in pixelClustDict if len(pixelClustDict[myKey]) > 1 ]
+        # Add this pixel into a single existing cluster. 
+        elif len( pixBelongs2Clstrs ) == 1:
+            bcl[pixBelongs2Clstrs[ 0 ]].append( currBp )
+            myStr = 'pixel {} inserted into cluster {}: {}\n'
+            print(myStr.format( currBp, pixBelongs2Clstrs[ 0 ], bcl[pixBelongs2Clstrs[ 0 ]] ))
+            pprint.pprint(bcl)
 
-    # Elminate duplicates from clusters that need to be combined. 
-    # { (1,2): [9,10]) } means pixel 1,2 is a member of clusters 9 and 10.
-    # { (2,3): [9,10]) } means pixel 2,3 is a member of clusters 9 and 10.
-    # Don't want to combine clusters 9 and 10 twice.
-    clustersToCombineNoDups = []
-    for ii in clustersToCombine:
-       if ii not in clustersToCombineNoDups:
-          clustersToCombineNoDups.append( ii )
+        # Create new combined cluster, delete old combined clusters then add this pixel to it.
+        elif len( pixBelongs2Clstrs ) == 2:
 
-    # Collapse Bcl.
-    collapsedBcl    = []
-    clustersHandled = []
+            set1 = set( bcl[ pixBelongs2Clstrs[ 0 ] ] ) # Combine clusters to single cluster.
+            set2 = set( bcl[ pixBelongs2Clstrs[ 1 ] ] )
+            set3 = set1.union( set2 )
+            tmpLst  = list( set3 )
 
-    currCombineIdx = 0
-    while currCombineIdx < len( clustersToCombineNoDups ):
+            myStr = 'Combined clusters {}: {}'
+            print(myStr.format( pixBelongs2Clstrs[ 0 ], pixBelongs2Clstrs[ 1 ] ))
 
-        print( 'combining/copying cluster  {} '.format( clustersToCombineNoDups[currCombineIdx] ) )
+            myStr = 'Deleted clusters {}: {}'
+            print(myStr.format( pixBelongs2Clstrs[ 0 ], pixBelongs2Clstrs[ 1 ] ))
+            del bcl[ pixBelongs2Clstrs[ 0 ] ]           # Remove combined clusters.
+            del bcl[ pixBelongs2Clstrs[ 1 ] - 1 ]
 
-        set1 = set( bcl[ clustersToCombineNoDups[ currCombineIdx ][0] ] )
-        set2 = set( bcl[ clustersToCombineNoDups[ currCombineIdx ][1] ] )
-        set3 = set1.union( set2 )
-        lst  = list( set3 )
+            bcl.append( tmpLst )
 
-        clustersHandled.extend( clustersToCombineNoDups[ currCombineIdx ] )
-        collapsedBcl.append( lst )
-        currCombineIdx += 1
+            mtYtr = 'Appended combined cluster {} to bcl {}'
+            print(myStr.format( tmpLst, bcl ))
 
-    currBclIdx = 0
-    while currBclIdx < len( bcl ):
-        if currBclIdx not in clustersHandled:
-            print( 'copying cluster  {} '.format( currBclIdx ) )
-            collapsedBcl.append( bcl[currBclIdx]  )
-            clustersHandled.append( currBclIdx )
-        currBclIdx += 1
+        else:
+            print('ERROR')
 
-    print( 'clusters handled' )
-    pprint.pprint( clustersHandled )
+    return bcl
 
-    return collapsedBcl
-
- # [[4, 5],
- # [9, 10],
- # [41, 42],
- # [52, 56],
- # [53, 57],
- # [54, 56],
- # [61, 62],
- # [69, 70],
- # [91, 92],
- # [121, 123],
- # [125, 126],
- # [144, 146]]
 #############################################
 
 if __name__ == '__main__':
@@ -132,7 +108,7 @@ if __name__ == '__main__':
     #       [ [ (1, 3), (1, 4), (2, 3), (2, 4) ], 
     #         [ (5, 5), (5, 6), (6, 5), (6, 6)] ]
 
-    for currGbpm in gBpm[0:4]:
+    for currGbpm in gBpm[0:1]:
 
         mBpl = makeBplFromBpm( currGbpm )
         mBcl = makeBclFromBpl( mBpl )
@@ -188,14 +164,16 @@ if __name__ == '__main__':
 #*    1 Clusters contain   23 Pixels. *   
 #*    1 Clusters contain   25 Pixels. *   1 Clusters contain   25 Pixels. *  
 
-
-
-
-
-
-
-
-
-
-
+# [[4, 5],
+# [9, 10],
+# [41, 42],
+# [52, 56],
+# [53, 57],
+# [54, 56],
+# [61, 62],
+# [69, 70],
+# [91, 92],
+# [121, 123],
+# [125, 126],
+# [144, 146]]
 
