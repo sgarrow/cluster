@@ -154,16 +154,3 @@ if __name__ == '__main__':
         print( ' * ')
     
         print( ' ' + '*' * 68 )
-
-# 102 Clusters contain    1 Pixels
-#  10 Clusters contain    2 Pixels
-#   9 Clusters contain    3 Pixels
-#   7 Clusters contain    4 Pixels
-#   4 Clusters contain    5 Pixels
-#   1 Clusters contain    6 Pixels
-#   2 Clusters contain   10 Pixels
-#   1 Clusters contain   13 Pixels
-#   1 Clusters contain   15 Pixels
-#   1 Clusters contain   17 Pixels
-#   1 Clusters contain   23 Pixels
-#   1 Clusters contain   25 Pixels
