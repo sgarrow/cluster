@@ -68,15 +68,15 @@ def makeBclFromBpl( bpl ):
         # delete old clusters, add new cluster to bcl.
         elif len( pixBelongs2Clstrs ) == 2:
 
-            set1 = set( bcl[ pixBelongs2Clstrs[ 0 ] ] ) # Combine.
+            set1 = set( bcl[ pixBelongs2Clstrs[ 0 ] ] ) # Combine into temp.
             set2 = set( bcl[ pixBelongs2Clstrs[ 1 ] ] )
             set3 = set1.union( set2 )
             tmpLst  = list( set3 )
 
-            tmpLst.append( currBp )                     # Append pixel.
-            bcl.append( tmpLst )                        # Append cluster.
+            tmpLst.append( currBp )                     # Append pixel to temp.
+            bcl.append( tmpLst )                        # Append temp to bcl.
 
-            del bcl[ pixBelongs2Clstrs[ 0 ] ]           # Delete.
+            del bcl[ pixBelongs2Clstrs[ 0 ] ]           # Delete Combined Clusters.
             del bcl[ pixBelongs2Clstrs[ 1 ] - 1 ]
 
             #myStr = 'pixel {} caused a combine/append/delete action of  clusters {} and {}'
@@ -90,44 +90,41 @@ def makeBclFromBpl( bpl ):
 
 #############################################
 
+# A Bad-Pixel-Map (bpm) is a 2D array of ints, like this:
+# 
+#           0  1  2  3   
+#       [ [ 0, 0, 0, 0  ],   # 0
+#         [ 0, 0, 0, 1  ],   # 1
+#         [ 0, 0, 0, 1  ],   # 2
+#         [ 0, 0, 0, 0  ], ] # 3
+# 
+# A Bad-Pixel-List (bpl) is a 1D array of Tuples, like this:
+#       [ (1, 3), (1, 4), (2, 4),
+#         (5, 5), (5, 6), (6, 6) ]
+# 
+# A Bad-Cluster-List (bcl) is a 2D array of Tuples, like this:
+# 
+#       [ [ (1, 3), (1, 4), (2, 4) ], 
+#         [ (5, 5), (5, 6), (6, 6)] ]
+
 if __name__ == '__main__':
 
-    from bpm import *
-
-    # Key to understanding this program is knowing the 'shape' of the data.
-    # 
-    # A Bad-Pixel-Map (bpm) is a 2D array of ints, like this:
-    # 
-    #           0  1  2  3   
-    #       [ [ 0, 0, 0, 0  ],   # 0
-    #         [ 0, 0, 0, 1  ],   # 1
-    #         [ 0, 0, 0, 1  ],   # 2
-    #         [ 0, 0, 0, 0  ], ] # 3
-    # 
-    # A Bad-Pixel-List (bpl) is a 1D array of Tuples, like this:
-    #       [ (1, 3), (1, 4), (2, 3), (2, 4),
-    #         (5, 5), (5, 6), (6, 5), (6, 6) ]
-    # 
-    # A Bad-Cluster-List (bcl) is a 2D array of Tuples, like this:
-    # 
-    #       [ [ (1, 3), (1, 4), (2, 3), (2, 4) ], 
-    #         [ (5, 5), (5, 6), (6, 5), (6, 6)] ]
-
+    from bpm import *                      # Load the Bad Pixel Maps.
     for jj, currGbpm in enumerate(gBpm):
 
-        startTime = time.process_time()
+        startTime = time.process_time()    # Time just the algorithm, not loading bpm. 
         mBpl = makeBplFromBpm( currGbpm )
         mBcl = makeBclFromBpl( mBpl )
     
         numClustersLenEq1 = sum(1 for c in mBcl if len(c) == 1)
         numClustersLenGt1 = sum(1 for c in mBcl if len(c)  > 1)
 
-        if len(mBcl):  # Cover case where there are no bad pixels.
+        if len(mBcl):  # Cover no bad pixels case.
             maxClusterSize = max(len(c) for c in mBcl)
         else:
             maxClusterSize = 0
-        endTime = time.process_time()
-        elapsedTime = endTime - startTime
+        endTime = time.process_time()      # Time just the algorithm, 
+        elapsedTime = endTime - startTime  # not analyzing/printing results.  
     
         hist = [0]*(maxClusterSize+1)
         for c in mBcl:
